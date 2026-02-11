@@ -1,50 +1,50 @@
-import { computed } from 'vue';
+import { computed, isRef } from 'vue';
 
-export function useStyles(configItem, styles) {
-  // 合并基础样式和自定义样式
+/**
+ * @param {import('vue').Ref|Object} configItemRef - 配置项，传 ref 时随 props 更新会触发样式重算
+ * @param {import('vue').Ref|Object} stylesRef - 样式配置，传 ref 时随 props 更新会触发样式重算
+ */
+export function useStyles(configItemRef, stylesRef) {
+  const configItem = isRef(configItemRef) ? configItemRef : { value: configItemRef };
+  const styles = isRef(stylesRef) ? stylesRef : { value: stylesRef };
+
+  // 合并基础样式和自定义样式（依赖 ref 以便 props.styles 更新后重算）
   const mergedStyles = computed(() => {
+    const item = configItem.value;
+    const s = styles.value || {};
     let baseStyles = {};
-    
-    // 应用类型基础样式
-    if (styles[configItem.type]) {
-      baseStyles = { ...baseStyles, ...styles[configItem.type] };
+    // heading 等按 level 取子对象，避免把 { h1, h2 } 当样式键展开
+    if (item.level && s[item.type]?.[`h${item.level}`]) {
+      baseStyles = { ...baseStyles, ...s[item.type][`h${item.level}`] };
+    } else if (s[item.type] && typeof s[item.type] === 'object' && !hasNestedLevelKeys(s[item.type])) {
+      baseStyles = { ...baseStyles, ...s[item.type] };
     }
-    
-    // 应用特定元素样式 (如 h1, h2)
-    if (configItem.level && styles[configItem.type]?.[`h${configItem.level}`]) {
-      baseStyles = { ...baseStyles, ...styles[configItem.type][`h${configItem.level}`] };
+    if (item.style && s.customStyles?.[item.style]) {
+      baseStyles = { ...baseStyles, ...s.customStyles[item.style] };
     }
-    
-    // 应用自定义样式
-    if (configItem.style && styles.customStyles?.[configItem.style]) {
-      baseStyles = { ...baseStyles, ...styles.customStyles[configItem.style] };
+    if (item.inlineStyles) {
+      baseStyles = { ...baseStyles, ...item.inlineStyles };
     }
-    
-    // 应用内联样式
-    if (configItem.inlineStyles) {
-      baseStyles = { ...baseStyles, ...configItem.inlineStyles };
-    }
-    
     return baseStyles;
   });
 
-  console.log("🚀 ~ :31 ~ useStyles ~ mergedStyles:", mergedStyles.value);
-
-  
-  // 转换为CSS样式字符串
+  // 转换为CSS样式字符串（仅展平值为字符串或数字的项）
   const cssStyles = computed(() => {
     return Object.entries(mergedStyles.value)
+      .filter(([, value]) => value != null && typeof value !== 'object')
       .map(([key, value]) => `${kebabCase(key)}: ${value}`)
       .join('; ');
   });
-
-  console.log("🚀 ~ :41 ~ useStyles ~ cssStyles:", cssStyles.value);
 
   
   return {
     mergedStyles,
     cssStyles
   };
+}
+
+function hasNestedLevelKeys(obj) {
+  return Object.keys(obj).some((k) => /^h\d+$/.test(k));
 }
 
 // 辅助函数: 驼峰转短横线命名

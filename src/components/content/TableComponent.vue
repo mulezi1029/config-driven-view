@@ -34,6 +34,7 @@
 
 <script>
 import { computed, defineAsyncComponent } from 'vue';
+import { toRef } from 'vue';
 import { useStyles } from '../../composables/useStyles';
 
 const ComponentRenderer = defineAsyncComponent(() => import('./ComponentRenderer.vue'));
@@ -54,7 +55,7 @@ export default {
     }
   },
   setup(props) {
-    const { cssStyles } = useStyles(props.config, props.styles);
+    const { cssStyles } = useStyles(toRef(props, 'config'), toRef(props, 'styles'));
 
     const tableRadius = computed(() => {
       return props.styles?.table?.borderRadius || '8px';

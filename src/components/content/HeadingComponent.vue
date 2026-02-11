@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { toRef } from 'vue';
 import { useStyles } from '../../composables/useStyles';
 
 export default {
@@ -25,8 +25,7 @@ export default {
     }
   },
   setup(props) {
-    const { cssStyles } = useStyles(props.config, props.styles);
-    
+    const { cssStyles } = useStyles(toRef(props, 'config'), toRef(props, 'styles'));
     return {
       cssStyles
     };

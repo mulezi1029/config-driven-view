@@ -211,9 +211,12 @@ export default {
       }
     };
     
-    // 保存配置
-    const saveConfig = async () => {
+    // 保存配置（newConfig 为编辑器 save 事件传来的当前内容，先写回 config 以触发预览重渲染，再持久化）
+    const saveConfig = async (newConfig) => {
       try {
+        if (newConfig) {
+          Object.assign(config, newConfig);
+        }
         const success = await saveConfigUtil(config);
         if (success) {
           saveVersion(config);
