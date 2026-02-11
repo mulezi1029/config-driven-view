@@ -50,24 +50,27 @@ export const parseConfig = (jsonString) => {
   }
 };
 
+// 使用 public 目录路径，构建后会复制到 dist，部署后可访问；BASE_URL 适配 GitHub Pages 等子路径部署
+const getExamplesBase = () => `${import.meta.env.BASE_URL}config/examples/`;
+
 // 获取示例配置文件列表
 export const getExampleConfigs = async () => {
-  // 模拟示例配置文件列表
+  const base = getExamplesBase();
   return [
     {
       id: 'user-agreement',
       name: '用户服务协议',
-      path: '/src/config/examples/user-agreement.json'
+      path: `${base}user-agreement.json`
     },
     {
       id: 'privacy-policy',
       name: '隐私政策',
-      path: '/src/config/examples/privacy-policy.json'
+      path: `${base}privacy-policy.json`
     },
     {
       id: 'tax-rules',
       name: '扣税规则',
-      path: '/src/config/examples/tax-rules.json'
+      path: `${base}tax-rules.json`
     }
   ];
 };

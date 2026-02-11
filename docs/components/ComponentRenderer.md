@@ -4,9 +4,14 @@
 
 `src/components/content/ComponentRenderer.vue`
 
-## 职责
+## 职责：只做「单节点 → 组件」
 
 根据单条配置节点的 `type` 从组件映射表中取出对应 Vue 组件，并渲染该组件，传入 `config` 与 `styles`。**不负责递归子节点**，递归由各容器组件在内部完成。
+
+- 输入：一个配置节点 + styles
+- 输出：一个对应类型的 Vue 组件实例
+
+> ComponentRenderer 只做一件事：拿到一条 config，根据 config.type 选组件并渲染，不关心「谁有子节点、子节点在哪」。
 
 ## Props
 
