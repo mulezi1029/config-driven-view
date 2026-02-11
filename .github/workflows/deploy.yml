@@ -21,14 +21,12 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-        working-directory: config-driven-protocol-demo
       
       - name: Build project
         run: npm run build
-        working-directory: config-driven-protocol-demo
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./config-driven-protocol-demo/dist
+          publish_dir: ./dist
