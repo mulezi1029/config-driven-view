@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import ComponentRenderer from '../content/ComponentRenderer.vue';
 
 export default {
@@ -66,6 +66,9 @@ export default {
     }
   },
   setup(props) {
+    watch(() => props.config, (newVal) => {
+      console.log("🚀 ~ :70 ~ watch ~ props.config:", newVal);
+    }, { deep: true, immediate: true });
     const isFullscreen = ref(false);
     const previewContainer = ref(null);
 

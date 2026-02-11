@@ -137,6 +137,7 @@ export default {
     
     // 监听props变化
     watch(() => props.modelValue, () => {
+      console.log("🚀 ~ :140 ~ watch ~ props.modelValue changed, initEditor");
       initEditor();
     }, { deep: true });
     

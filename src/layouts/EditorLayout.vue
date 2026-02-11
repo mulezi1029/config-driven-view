@@ -46,6 +46,7 @@
       <div class="w-1/2 border-r border-gray-200 flex flex-col">
         <div class="flex-1 p-4 overflow-auto">
           <config-editor
+            :key="currentConfigKey"
             v-model="config"
             @save="saveConfig"
             @reset="resetConfig"
@@ -53,10 +54,19 @@
         </div>
       </div>
       
-      <!-- 右侧预览区 -->
+      <!-- 右侧预览区与版本控制 -->
       <div class="w-1/2 flex flex-col">
         <div class="flex-1 p-4 overflow-auto">
-          <preview-panel :config="config" />
+          <preview-panel :key="currentConfigKey" :config="config" />
+        </div>
+        <div class="border-t border-gray-200 p-4 flex-shrink-0 bg-gray-50">
+          <version-control
+            v-if="activeVersionState"
+            :current-version="currentVersionDisplay"
+            :version-history="versionHistoryDisplay"
+            @save-version="onSaveVersion"
+            @rollback-version="onRollbackVersion"
+          />
         </div>
       </div>
     </main>
@@ -70,7 +80,8 @@
           </span>
         </div>
         <div>
-          版本: {{ currentVersion }}
+          <span v-if="currentConfigKey">{{ currentConfigName }} · </span>
+          版本: {{ currentVersionDisplay }}
         </div>
       </div>
     </footer>
@@ -78,12 +89,12 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import ConfigEditor from '../components/common/ConfigEditor.vue';
 import PreviewPanel from '../components/common/PreviewPanel.vue';
 import VersionControl from '../components/common/VersionControl.vue';
 import { loadConfig, saveConfig as saveConfigUtil, getExampleConfigs } from '../utils/configParser';
-import { useVersionControl } from '../composables/useVersionControl';
+import { useVersionControlStore } from '../composables/useVersionControl';
 
 export default {
   name: 'EditorLayout',
@@ -93,8 +104,8 @@ export default {
     VersionControl
   },
   setup() {
-    // 配置数据
-    const config = reactive({
+    // 配置数据（使用 ref 以便切换示例时整体替换引用，强制编辑器和预览更新）
+    const config = ref({
       version: '1.0.0',
       metadata: {
         title: '未命名文档',
@@ -173,14 +184,25 @@ export default {
     // 示例配置列表
     const exampleConfigs = ref([]);
     const dropdownOpen = ref(false);
-    
-    // 版本控制
-    const { 
-      currentVersion, 
-      versionHistory, 
-      saveVersion, 
-      rollbackToVersion 
-    } = useVersionControl(config);
+
+    // 按配置文件维度的版本控制：当前配置 key、对应版本状态
+    const DEFAULT_CONFIG_KEY = 'default';
+    const currentConfigKey = ref(DEFAULT_CONFIG_KEY);
+    const versionStore = useVersionControlStore();
+    const activeVersionState = ref(null);
+
+    const currentVersionDisplay = computed(() => {
+      const state = activeVersionState.value;
+      return state?.currentVersion?.value ?? config.value?.version ?? '1.0.0';
+    });
+    const versionHistoryDisplay = computed(() => {
+      return activeVersionState.value?.getHistory() ?? [];
+    });
+    const currentConfigName = computed(() => {
+      if (currentConfigKey.value === DEFAULT_CONFIG_KEY) return '未命名';
+      const ex = exampleConfigs.value.find((e) => e.id === currentConfigKey.value);
+      return ex?.name ?? currentConfigKey.value;
+    });
 
     
     // 加载示例配置
@@ -192,12 +214,13 @@ export default {
       }
     };
     
-    // 加载示例
+    // 加载示例：整体替换 config 引用，确保编辑器和预览都切换到新数据
     const loadExample = async (example) => {
       try {
         const loadedConfig = await loadConfig(example.path);
-        Object.assign(config, loadedConfig);
-        saveVersion(config);
+        currentConfigKey.value = example.id;
+        activeVersionState.value = versionStore.getOrCreateVersionState(example.id, loadedConfig);
+        config.value = JSON.parse(JSON.stringify(loadedConfig));
         dropdownOpen.value = false;
       } catch (error) {
         console.error('加载示例失败:', error);
@@ -215,11 +238,11 @@ export default {
     const saveConfig = async (newConfig) => {
       try {
         if (newConfig) {
-          Object.assign(config, newConfig);
+          config.value = JSON.parse(JSON.stringify(newConfig));
         }
-        const success = await saveConfigUtil(config);
+        const success = await saveConfigUtil(config.value);
         if (success) {
-          saveVersion(config);
+          activeVersionState.value?.saveVersion(config.value);
           saveStatus.value = {
             success: true,
             message: '配置保存成功'
@@ -234,28 +257,45 @@ export default {
           message: `保存失败: ${error.message}`
         };
       }
-      
       setTimeout(() => {
         saveStatus.value = null;
       }, 3000);
     };
     
-    // 重置配置
+    // 重置配置：恢复到当前配置文件最近一次保存的版本
     const resetConfig = () => {
       if (confirm('确定要重置配置吗？当前未保存的更改将会丢失。')) {
-        const latestVersion = versionHistory.value[versionHistory.value.length - 1];
-        if (latestVersion) {
-          Object.assign(config, JSON.parse(JSON.stringify(latestVersion.config)));
+        const history = activeVersionState.value?.getHistory();
+        const latest = history?.[0];
+        if (latest?.config) {
+          config.value = JSON.parse(JSON.stringify(latest.config));
         }
+      }
+    };
+
+    // 版本控制：保存新版本（由 VersionControl 触发）
+    const onSaveVersion = (customVersion) => {
+      const newVersion = activeVersionState.value?.saveVersion(config.value, customVersion || null);
+      if (newVersion) {
+        saveStatus.value = { success: true, message: `已保存为版本 ${newVersion}` };
+        setTimeout(() => { saveStatus.value = null; }, 2000);
+      }
+    };
+
+    // 版本控制：回滚到指定版本
+    const onRollbackVersion = (version) => {
+      const rolled = activeVersionState.value?.rollbackToVersion(version);
+      if (rolled) {
+        config.value = JSON.parse(JSON.stringify(rolled));
       }
     };
     
     // 导出配置
     const exportConfig = () => {
-      const dataStr = JSON.stringify(config, null, 2);
+      const dataStr = JSON.stringify(config.value, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
       
-      const exportFileDefaultName = `config-${config.metadata?.title || 'document'}-${new Date().toISOString().split('T')[0]}.json`;
+      const exportFileDefaultName = `config-${config.value?.metadata?.title || 'document'}-${new Date().toISOString().split('T')[0]}.json`;
       
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
@@ -268,25 +308,29 @@ export default {
       dropdownOpen.value = !dropdownOpen.value;
     };
     
-    // 组件挂载时加载示例配置
+    // 组件挂载时加载示例配置，并初始化默认配置的版本状态
     onMounted(() => {
       loadExampleConfigs();
+      activeVersionState.value = versionStore.getOrCreateVersionState(DEFAULT_CONFIG_KEY, config.value);
     });
-    
+
     return {
       config,
       saveStatus,
       exampleConfigs,
       dropdownOpen,
-      currentVersion,
-      versionHistory,
+      currentConfigKey,
+      activeVersionState,
+      currentVersionDisplay,
+      versionHistoryDisplay,
+      currentConfigName,
       loadExample,
       saveConfig,
       resetConfig,
       exportConfig,
       toggleDropdown,
-      saveVersion,
-      rollbackToVersion
+      onSaveVersion,
+      onRollbackVersion
     };
   }
 };
