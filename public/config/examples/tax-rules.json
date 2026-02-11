@@ -57,52 +57,53 @@
         "marginBottom": "15px",
         "borderRadius": "0 4px 4px 0"
       },
-      "formulaBlock": {
-      }
+      "formulaBlock": {}
     }
   },
-  "content": [
+  "children": [
     {
       "type": "list",
       "style": "ordered",
-      "items": [
-        "2025年10月1日开始的提现将按国家税务总局公告15、公告16新规执行。",
-        "您所获报酬的计算规则不变，您最终可获得的劳务报酬以平台上显示的可提现金额为准。海握将根据您的提现申请，实时发放您的报酬并完成税务登记。",
-        "提现时将根据您的提现金额预扣个税，预扣个税计算规则如下图：如果您的月提现金额低于6250，则无需预扣个税。"
-      ],
       "inlineStyles": {
         "fontSize": "15px",
         "color": "#111111"
-      }
+      },
+      "children": [
+        { "type": "text", "content": "2025年10月1日开始的提现将按国家税务总局公告15、公告16新规执行。" },
+        { "type": "text", "content": "您所获报酬的计算规则不变，您最终可获得的劳务报酬以平台上显示的可提现金额为准。海握将根据您的提现申请，实时发放您的报酬并完成税务登记。" },
+        { "type": "text", "content": "提现时将根据您的提现金额预扣个税，预扣个税计算规则如下图：如果您的月提现金额低于6250，则无需预扣个税。" }
+      ]
     },
     {
       "type": "table",
       "headers": ["预扣个税计算公式"],
-      "rows": [
-        [
-          {
-            "type": "image",
-            "src": "https://images3.c-ctrip.com/marketing-openPlatform/taxFormula.png",
-            "alt": "预扣个税计算公式",
-            "height": "30px",
-            "inlineStyles": {
-              "marginBottom": "0"
-            }
-          }
-        ]
-      ],
       "style": "formulaBlock",
       "inlineStyles": {
         "marginBottom": "0"
-      }
+      },
+      "children": [
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "image",
+              "src": "https://images3.c-ctrip.com/marketing-openPlatform/taxFormula.png",
+              "alt": "预扣个税计算公式",
+              "height": "30px",
+              "inlineStyles": {
+                "marginBottom": "0"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "list",
       "style": "unordered",
-      "items": [
+      "children": [
         {
           "type": "note",
-          "content": "累计收入 = 当年截至本月在平台企业连续取得劳务报酬的金额合计，某月无收入将重新计算。",
           "inlineStyles": {
             "color": "#888888",
             "fontSize": "13px",
@@ -110,11 +111,13 @@
             "borderLeft": "none",
             "padding": "0",
             "marginBottom": "4px"
-          }
+          },
+          "children": [
+            { "type": "text", "content": "累计收入 = 当年截至本月在平台企业连续取得劳务报酬的金额合计，某月无收入将重新计算。" }
+          ]
         },
         {
           "type": "note",
-          "content": "累计费用 = 累计收入 × 20%。",
           "inlineStyles": {
             "color": "#888888",
             "fontSize": "13px",
@@ -122,11 +125,13 @@
             "borderLeft": "none",
             "padding": "0",
             "marginBottom": "4px"
-          }
+          },
+          "children": [
+            { "type": "text", "content": "累计费用 = 累计收入 × 20%。" }
+          ]
         },
         {
           "type": "note",
-          "content": "累计减除费用 = 按照5000元/月乘以纳税人当年截至本月在平台企业连续取得劳务报酬的月份。",
           "inlineStyles": {
             "color": "#888888",
             "fontSize": "13px",
@@ -134,47 +139,105 @@
             "borderLeft": "none",
             "padding": "0",
             "marginBottom": "4px"
-          }
+          },
+          "children": [
+            { "type": "text", "content": "累计减除费用 = 按照5000元/月乘以纳税人当年截至本月在平台企业连续取得劳务报酬的月份。" }
+          ]
         }
       ]
     },
     {
       "type": "note",
-      "content": "即：个税 = 收入 × 80% - 5000 后，再匹配税率表计算。月收入低于6250元无需预扣个税。",
       "inlineStyles": {
         "color": "#888888",
         "fontSize": "13px"
-      }
+      },
+      "children": [
+        { "type": "text", "content": "即：个税 = 收入 × 80% - 5000 后，再匹配税率表计算。月收入低于6250元无需预扣个税。" }
+      ]
     },
     {
       "type": "table",
-      "headers": [
-        "级数",
-        "累计预扣预缴应纳税所得额",
-        "预扣率",
-        "速算扣除数"
-      ],
-      "rows": [
-        ["1", "不超过36000", "3%", "0"],
-        ["2", "超过36000至144000的部分", "10%", "2520"],
-        ["3", "超过144000至300000的部分", "20%", "16920"],
-        ["4", "超过300000至420000的部分", "25%", "31920"],
-        ["5", "超过420000至660000的部分", "30%", "52920"],
-        ["6", "超过660000至960000的部分", "35%", "85920"],
-        ["7", "超过960000的部分", "45%", "181920"]
-      ],
+      "headers": ["级数", "累计预扣预缴应纳税所得额", "预扣率", "速算扣除数"],
       "columnAlignments": ["center", "left", "center", "center"],
       "inlineStyles": {
         "marginBottom": "20px"
-      }
+      },
+      "children": [
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "1" },
+            { "type": "text", "content": "不超过36000" },
+            { "type": "text", "content": "3%" },
+            { "type": "text", "content": "0" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "2" },
+            { "type": "text", "content": "超过36000至144000的部分" },
+            { "type": "text", "content": "10%" },
+            { "type": "text", "content": "2520" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "3" },
+            { "type": "text", "content": "超过144000至300000的部分" },
+            { "type": "text", "content": "20%" },
+            { "type": "text", "content": "16920" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "4" },
+            { "type": "text", "content": "超过300000至420000的部分" },
+            { "type": "text", "content": "25%" },
+            { "type": "text", "content": "31920" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "5" },
+            { "type": "text", "content": "超过420000至660000的部分" },
+            { "type": "text", "content": "30%" },
+            { "type": "text", "content": "52920" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "6" },
+            { "type": "text", "content": "超过660000至960000的部分" },
+            { "type": "text", "content": "35%" },
+            { "type": "text", "content": "85920" }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            { "type": "text", "content": "7" },
+            { "type": "text", "content": "超过960000的部分" },
+            { "type": "text", "content": "45%" },
+            { "type": "text", "content": "181920" }
+          ]
+        }
+      ]
     },
     {
       "type": "note",
-      "content": "如果您有其他工作，在每个税汇算清缴时，国家个人所得税系统会汇总您的全部收入，可能需要补税。",
       "inlineStyles": {
         "color": "#888888",
         "fontSize": "13px"
-      }
+      },
+      "children": [
+        { "type": "text", "content": "如果您有其他工作，在每个税汇算清缴时，国家个人所得税系统会汇总您的全部收入，可能需要补税。" }
+      ]
     }
   ]
 }

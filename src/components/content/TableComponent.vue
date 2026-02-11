@@ -13,36 +13,28 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, rowIndex) in config.rows" :key="rowIndex">
-        <td
-          v-for="(cell, cellIndex) in row"
-          :key="cellIndex"
-          class="table-cell"
-          :style="getBodyCellStyle(rowIndex, cellIndex, row)"
-        >
-          <component-renderer
-            v-if="isCellObject(cell)"
-            :config="cell"
-            :styles="styles"
-          />
-          <template v-else>{{ cell }}</template>
-        </td>
-      </tr>
+      <table-row-component
+        v-for="(row, rowIndex) in config.children"
+        :key="rowIndex"
+        :config="row"
+        :styles="styles"
+        :row-index="rowIndex"
+        :get-body-cell-style="getBodyCellStyle"
+      />
     </tbody>
   </table>
 </template>
 
 <script>
-import { computed, defineAsyncComponent } from 'vue';
+import { computed } from 'vue';
 import { toRef } from 'vue';
 import { useStyles } from '../../composables/useStyles';
-
-const ComponentRenderer = defineAsyncComponent(() => import('./ComponentRenderer.vue'));
+import TableRowComponent from './TableRowComponent.vue';
 
 export default {
   name: 'TableComponent',
   components: {
-    ComponentRenderer
+    TableRowComponent
   },
   props: {
     config: {
@@ -109,9 +101,9 @@ export default {
       const base = baseWithoutBorder(cellStyles.value);
       const alignments = props.config.columnAlignments;
       const radius = tableRadius.value;
-      const rowCount = props.config.rows?.length ?? 0;
+      const rowCount = props.config.children?.length ?? 0;
       const isLastRow = rowCount > 0 && rowIndex === rowCount - 1;
-      const colCount = row?.length ?? 0;
+      const colCount = row?.children?.length ?? 0;
       const border = borderValue.value;
       const cellBorder = {
         borderRight: border,
@@ -132,18 +124,13 @@ export default {
       return { ...base, ...cellBorder };
     };
 
-    const isCellObject = (cell) => {
-      return cell && typeof cell === 'object' && cell.type;
-    };
-
     return {
       cssStyles,
       tableRadius,
       headerStyles,
       cellStyles,
       getHeaderCellStyle,
-      getBodyCellStyle,
-      isCellObject
+      getBodyCellStyle
     };
   }
 };

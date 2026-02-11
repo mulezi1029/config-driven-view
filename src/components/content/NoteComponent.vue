@@ -5,13 +5,10 @@
     </div>
     <div class="note-content">
       <component-renderer
-        v-if="typeof config.content === 'object'"
-        :config="config.content"
+        v-if="config.children?.length > 0"
+        :config="config.children[0]"
         :styles="styles"
       />
-      <template v-else>
-        {{ config.content }}
-      </template>
     </div>
   </div>
 </template>

@@ -41,7 +41,7 @@
       </div>
       
       <component-renderer
-        v-for="(item, index) in config.content"
+        v-for="(item, index) in config.children"
         :key="index"
         :config="item"
         :styles="config.styles"

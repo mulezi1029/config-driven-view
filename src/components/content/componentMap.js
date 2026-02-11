@@ -9,6 +9,8 @@ import ImageComponent from './ImageComponent.vue';
 import LinkComponent from './LinkComponent.vue';
 import DividerComponent from './DividerComponent.vue';
 import NoteComponent from './NoteComponent.vue';
+import TextComponent from './TextComponent.vue';
+import TableRowComponent from './TableRowComponent.vue';
 
 export const componentMap = {
   heading: HeadingComponent,
@@ -21,5 +23,7 @@ export const componentMap = {
   image: ImageComponent,
   link: LinkComponent,
   divider: DividerComponent,
-  note: NoteComponent
+  note: NoteComponent,
+  text: TextComponent,
+  tableRow: TableRowComponent
 };

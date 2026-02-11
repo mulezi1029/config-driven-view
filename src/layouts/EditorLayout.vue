@@ -133,7 +133,7 @@ export default {
           }
         }
       },
-      content: [
+      children: [
         {
           type: 'heading',
           level: 1,
@@ -146,7 +146,7 @@ export default {
         {
           type: 'section',
           title: '功能介绍',
-          content: [
+          children: [
             {
               type: 'paragraph',
               content: '本编辑器支持以下功能：'
@@ -154,12 +154,12 @@ export default {
             {
               type: 'list',
               style: 'unordered',
-              items: [
-                '配置驱动的视图渲染',
-                '支持嵌套结构的内容展示',
-                '支持富文本、列表、表格等多种内容格式',
-                '实时预览配置变更效果',
-                '版本控制与回滚机制'
+              children: [
+                { type: 'text', content: '配置驱动的视图渲染' },
+                { type: 'text', content: '支持嵌套结构的内容展示' },
+                { type: 'text', content: '支持富文本、列表、表格等多种内容格式' },
+                { type: 'text', content: '实时预览配置变更效果' },
+                { type: 'text', content: '版本控制与回滚机制' }
               ]
             }
           ]

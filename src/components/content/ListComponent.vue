@@ -5,19 +5,15 @@
     :style="cssStyles"
   >
     <li
-      v-for="(item, index) in config.items"
+      v-for="(item, index) in config.children"
       :key="index"
       class="list-item"
       :style="listItemStyles"
     >
       <component-renderer
-        v-if="typeof item === 'object'"
         :config="item"
         :styles="styles"
       />
-      <template v-else>
-        {{ item }}
-      </template>
     </li>
   </component>
 </template>

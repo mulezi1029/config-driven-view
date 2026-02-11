@@ -15,8 +15,8 @@ export function useConfigValidation() {
       return false;
     }
     
-    if (!config.content || !Array.isArray(config.content)) {
-      errors.value.push('配置文件必须包含content数组');
+    if (!config.children || !Array.isArray(config.children)) {
+      errors.value.push('配置文件必须包含children数组');
     }
     
     if (!config.version) {
@@ -24,13 +24,13 @@ export function useConfigValidation() {
     }
     
     // 验证内容结构
-    validateContent(config.content);
+    validateContent(config.children);
     
     return errors.value.length === 0;
   };
   
   // 递归验证内容项
-  const validateContent = (contentItems, path = 'content') => {
+  const validateContent = (contentItems, path = 'children') => {
     if (!Array.isArray(contentItems)) return;
     
     contentItems.forEach((item, index) => {
@@ -50,30 +50,61 @@ export function useConfigValidation() {
           break;
         case 'paragraph':
         case 'richText':
-        case 'note':
           if (!item.content) {
             errors.value.push(`${itemPath} (${item.type}) 缺少content字段`);
           }
           break;
+        case 'note':
+          if (!item.children || !Array.isArray(item.children)) {
+            errors.value.push(`${itemPath} (note) 缺少children数组`);
+          } else if (item.children.length > 1) {
+            errors.value.push(`${itemPath} (note) children最多1个元素`);
+          } else if (item.children.length === 1) {
+            validateContent(item.children, `${itemPath}.children`);
+          }
+          break;
         case 'list':
-          if (!item.items || !Array.isArray(item.items)) {
-            errors.value.push(`${itemPath} (list) 缺少items数组`);
+          if (!item.children || !Array.isArray(item.children)) {
+            errors.value.push(`${itemPath} (list) 缺少children数组`);
+          } else {
+            validateContent(item.children, `${itemPath}.children`);
           }
           break;
         case 'table':
           if (!item.headers || !Array.isArray(item.headers)) {
             errors.value.push(`${itemPath} (table) 缺少headers数组`);
           }
-          if (!item.rows || !Array.isArray(item.rows)) {
-            errors.value.push(`${itemPath} (table) 缺少rows数组`);
+          if (!item.children || !Array.isArray(item.children)) {
+            errors.value.push(`${itemPath} (table) 缺少children数组`);
+          } else {
+            item.children.forEach((row, rowIdx) => {
+              if (!row.type || row.type !== 'tableRow') {
+                errors.value.push(`${itemPath}.children[${rowIdx}] 应为tableRow节点`);
+              } else if (!row.children || !Array.isArray(row.children)) {
+                errors.value.push(`${itemPath}.children[${rowIdx}] (tableRow) 缺少children数组`);
+              } else {
+                validateContent(row.children, `${itemPath}.children[${rowIdx}].children`);
+              }
+            });
           }
           break;
         case 'section':
-          if (!item.content || !Array.isArray(item.content)) {
-            errors.value.push(`${itemPath} (section) 缺少content数组`);
+          if (!item.children || !Array.isArray(item.children)) {
+            errors.value.push(`${itemPath} (section) 缺少children数组`);
           } else {
-            // 递归验证section内容
-            validateContent(item.content, `${itemPath}.content`);
+            validateContent(item.children, `${itemPath}.children`);
+          }
+          break;
+        case 'text':
+          if (item.content === undefined || item.content === null) {
+            errors.value.push(`${itemPath} (text) 缺少content字段`);
+          }
+          break;
+        case 'tableRow':
+          if (!item.children || !Array.isArray(item.children)) {
+            errors.value.push(`${itemPath} (tableRow) 缺少children数组`);
+          } else {
+            validateContent(item.children, `${itemPath}.children`);
           }
           break;
         case 'image':

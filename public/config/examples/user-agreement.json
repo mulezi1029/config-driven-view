@@ -72,7 +72,7 @@
       }
     }
   },
-  "content": [
+  "children": [
     {
       "type": "heading",
       "level": 1,
@@ -85,7 +85,7 @@
     {
       "type": "section",
       "title": "1. 协议的接受",
-      "content": [
+      "children": [
         {
           "type": "paragraph",
           "content": "通过访问或使用我们的服务，您确认您已阅读、理解并同意受本协议的约束。如果您不同意本协议的任何条款，您应立即停止访问或使用我们的服务。"
@@ -93,14 +93,10 @@
         {
           "type": "list",
           "style": "ordered",
-          "items": [
-            "您必须年满18周岁才能使用我们的服务。",
-            "您需要提供真实、准确的个人信息。",
-            {
-              "type": "styledText",
-              "style": "highlight",
-              "content": "您不得将我们的服务用于任何非法目的。"
-            }
+          "children": [
+            { "type": "text", "content": "您必须年满18周岁才能使用我们的服务。" },
+            { "type": "text", "content": "您需要提供真实、准确的个人信息。" },
+            { "type": "styledText", "style": "highlight", "content": "您不得将我们的服务用于任何非法目的。" }
           ]
         }
       ]
@@ -108,7 +104,7 @@
     {
       "type": "section",
       "title": "2. 服务内容",
-      "content": [
+      "children": [
         {
           "type": "paragraph",
           "content": "我们提供的服务可能随时变更，我们保留在不通知您的情况下修改、暂停或终止服务的权利。"
@@ -116,22 +112,45 @@
         {
           "type": "table",
           "headers": ["服务类型", "描述", "收费标准"],
-          "rows": [
-            ["基础服务", "提供基本功能访问", "免费"],
-            ["高级服务", "提供高级功能和额外支持", "每月$9.99"],
-            ["企业服务", "提供企业级功能和专属支持", "联系销售"]
+          "children": [
+            {
+              "type": "tableRow",
+              "children": [
+                { "type": "text", "content": "基础服务" },
+                { "type": "text", "content": "提供基本功能访问" },
+                { "type": "text", "content": "免费" }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "children": [
+                { "type": "text", "content": "高级服务" },
+                { "type": "text", "content": "提供高级功能和额外支持" },
+                { "type": "text", "content": "每月$9.99" }
+              ]
+            },
+            {
+              "type": "tableRow",
+              "children": [
+                { "type": "text", "content": "企业服务" },
+                { "type": "text", "content": "提供企业级功能和专属支持" },
+                { "type": "text", "content": "联系销售" }
+              ]
+            }
           ]
         },
         {
           "type": "note",
-          "content": "我们可能会不时调整服务内容和收费标准，请定期查看最新信息。"
+          "children": [
+            { "type": "text", "content": "我们可能会不时调整服务内容和收费标准，请定期查看最新信息。" }
+          ]
         }
       ]
     },
     {
       "type": "section",
       "title": "3. 用户行为规范",
-      "content": [
+      "children": [
         {
           "type": "paragraph",
           "content": "在使用我们的服务时，您同意不会从事以下行为："
@@ -139,12 +158,12 @@
         {
           "type": "list",
           "style": "unordered",
-          "items": [
-            "违反任何适用的法律法规",
-            "侵犯他人的知识产权或其他权利",
-            "传播病毒、恶意软件或其他有害内容",
-            "干扰或破坏服务的正常运行",
-            "收集或存储其他用户的个人信息"
+          "children": [
+            { "type": "text", "content": "违反任何适用的法律法规" },
+            { "type": "text", "content": "侵犯他人的知识产权或其他权利" },
+            { "type": "text", "content": "传播病毒、恶意软件或其他有害内容" },
+            { "type": "text", "content": "干扰或破坏服务的正常运行" },
+            { "type": "text", "content": "收集或存储其他用户的个人信息" }
           ]
         },
         {
@@ -157,7 +176,7 @@
     {
       "type": "section",
       "title": "4. 知识产权",
-      "content": [
+      "children": [
         {
           "type": "paragraph",
           "content": "我们的服务和相关内容的知识产权归我们所有。您仅获得有限的、非排他性的使用权，不得复制、修改、分发或出售任何内容。"
@@ -167,16 +186,14 @@
     {
       "type": "section",
       "title": "5. 免责声明",
-      "content": [
+      "children": [
         {
           "type": "paragraph",
           "content": "我们的服务按\"原样\"提供，不附带任何形式的保证。在法律允许的最大范围内，我们不承担因使用或无法使用我们的服务而导致的任何直接、间接、偶然、特殊或后果性的损害。"
         }
       ]
     },
-    {
-      "type": "divider"
-    },
+    { "type": "divider" },
     {
       "type": "paragraph",
       "content": "最后更新日期：2023年7月21日"
