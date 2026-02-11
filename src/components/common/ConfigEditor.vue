@@ -19,12 +19,15 @@
       </div>
     </div>
     
-    <div class="editor-content">
+    <div class="editor-content editor-overlay-wrap">
+      <pre class="editor-highlight-layer" aria-hidden="true"><code ref="highlightBlock" class="language-json">{{ configText }}</code></pre>
       <textarea
         ref="editorTextarea"
-        class="code-editor w-full h-[500px] p-4 border rounded"
+        class="code-editor code-editor-overlay w-full h-full p-4 border rounded"
         v-model="configText"
+        wrap="off"
         @input="onConfigChange"
+        @scroll="syncScroll"
         spellcheck="false"
       ></textarea>
     </div>
@@ -65,6 +68,7 @@ export default {
   setup(props, { emit }) {
     const configText = ref('');
     const editorTextarea = ref(null);
+    const highlightBlock = ref(null);
     const { errors, warnings, validateConfig } = useConfigValidation();
     const isValid = ref(true);
     
@@ -76,10 +80,25 @@ export default {
       });
     };
     
-    // 高亮代码
+    // 高亮代码：在底层 pre/code 上渲染高亮结果，textarea 仅负责输入
     const highlightCode = () => {
-      if (editorTextarea.value) {
-        Prism.highlightElement(editorTextarea.value);
+      if (highlightBlock.value && configText.value !== undefined) {
+        const html = Prism.highlight(
+          configText.value,
+          Prism.languages.json,
+          'json'
+        );
+        highlightBlock.value.innerHTML = html;
+      }
+    };
+    
+    // 同步 textarea 滚动到高亮层，保证两者滚动一致
+    const syncScroll = () => {
+      const textarea = editorTextarea.value;
+      const pre = highlightBlock.value?.parentElement;
+      if (textarea && pre) {
+        pre.scrollTop = textarea.scrollTop;
+        pre.scrollLeft = textarea.scrollLeft;
       }
     };
     
@@ -127,10 +146,12 @@ export default {
     return {
       configText,
       editorTextarea,
+      highlightBlock,
       errors,
       warnings,
       isValid,
       onConfigChange,
+      syncScroll,
       saveConfig,
       resetConfig
     };
@@ -147,10 +168,59 @@ export default {
 
 .editor-content {
   flex: 1;
-  overflow: auto;
 }
 
-/* 覆盖Prism样式以适应我们的编辑器 */
+/* 高亮层 + 透明 textarea 叠加，实现可编辑 JSON 高亮；统一由容器高度约束 */
+.editor-overlay-wrap {
+  position: relative;
+  height: 500px;
+}
+
+.editor-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  white-space: pre;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background: #fff;
+  pointer-events: none;
+}
+
+.editor-highlight-layer code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
+
+.code-editor-overlay {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  color: transparent;
+  caret-color: #333;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.code-editor-overlay::selection {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+/* 覆盖 Prism 样式以适应我们的编辑器 */
 :deep(.token.property) {
   color: #905;
 }
